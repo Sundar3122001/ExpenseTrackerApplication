@@ -1,8 +1,9 @@
+// src/components/Login.js
 import React, { useState } from "react";
 import api from "../api/api";
 
-function Login() {
-  const [form, setForm] = useState({ email: "", password: "" }); // ✅ use email
+function Login({ onLogin }) {
+  const [form, setForm] = useState({ email: "", password: "" });
 
   const handleChange = (e) =>
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -11,11 +12,15 @@ function Login() {
     e.preventDefault();
     try {
       const res = await api.post("/auth/login", form);
-      localStorage.setItem("token", res.data.token); // save JWT if backend returns it
-      alert("Login successful!");
+      if (res.data) {
+        localStorage.setItem("token", res.data.token || "");
+        alert("✅ Login successful!");
+        setForm({ email: "", password: "" });
+        onLogin(); // ✅ trigger App to show Transaction UI
+      }
     } catch (err) {
-      console.error(err); // helps debug backend errors
-      alert("Invalid credentials!");
+      console.error(err);
+      alert("❌ Invalid credentials!");
     }
   };
 
@@ -23,8 +28,8 @@ function Login() {
     <form onSubmit={handleSubmit}>
       <h2>Login</h2>
       <input
-        name="email"
         type="email"
+        name="email"
         placeholder="Email"
         value={form.email}
         onChange={handleChange}
