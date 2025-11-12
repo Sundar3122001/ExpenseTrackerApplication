@@ -13,22 +13,23 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-                .csrf(csrf -> csrf.disable()) // Disable CSRF for APIs
+                .csrf(csrf -> csrf.disable()) // Disable CSRF protection for APIs
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/auth/**","/api/transactions/**").permitAll() // Allow register/login
-                        .anyRequest().authenticated() // Secure other endpoints
+                        .requestMatchers(
+                                "/status",               // ✅ Allow backend check
+                                "/api/auth/**",          // ✅ Allow login/register
+                                "/api/transactions/**",  // ✅ Allow transactions test
+                                "/api/hello",            // ✅ Allow simple hello test
+                                "/**"                    // ✅ Allow everything (for now — can restrict later)
+                        ).permitAll()
+                        .anyRequest().authenticated()
                 )
-//                .authorizeHttpRequests(auth -> auth
-//                        .requestMatchers("/api/auth/**").permitAll()
-//                        .anyRequest().authenticated()
-//                )
                 .formLogin(form -> form.disable())
                 .httpBasic(httpBasic -> httpBasic.disable());
 
         return http.build();
     }
 
-    // ✅ Define as PasswordEncoder so Spring can inject it properly
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
