@@ -5,14 +5,13 @@ import com.example.expense_tracker.models.User;
 import com.example.expense_tracker.repository.UserRepository;
 import com.example.expense_tracker.service.TransactionService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
 @RequestMapping("/api/transactions")
-@CrossOrigin(origins = "http://localhost:3000") // Allow frontend
+@CrossOrigin(origins = "http://localhost:3000") // frontend origin
 public class TransactionController {
 
     @Autowired
@@ -21,24 +20,21 @@ public class TransactionController {
     @Autowired
     private UserRepository userRepository;
 
-    // ✅ Add a transaction for the logged-in user
+    // ✅ Add a transaction
     @PostMapping
-    public Transaction addTransaction(@RequestBody Transaction transaction, Authentication auth) {
-        String email = auth.getName();
+    public Transaction addTransaction(@RequestBody Transaction transaction,
+                                      @RequestParam String email) {
         User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("User not found"));
-
+                .orElseThrow(() -> new RuntimeException("❌ User email not found! Please login again."));
         transaction.setUser(user);
         return transactionService.addTransaction(transaction);
     }
 
-    // ✅ Get all transactions for the logged-in user
+    // ✅ Get all transactions for a user
     @GetMapping
-    public List<Transaction> getTransactions(Authentication auth) {
-        String email = auth.getName();
+    public List<Transaction> getTransactions(@RequestParam String email) {
         User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("User not found"));
-
+                .orElseThrow(() -> new RuntimeException("❌ User email not found! Please login again."));
         return transactionService.getTransactionsByUser(user);
     }
 }

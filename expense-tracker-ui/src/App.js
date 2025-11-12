@@ -6,9 +6,12 @@ import TransactionList from "./components/TransactionList";
 
 function App() {
   const [loggedIn, setLoggedIn] = useState(false);
-  const [refresh, setRefresh] = useState(0); // to trigger list reload
+  const [email, setEmail] = useState("");
 
-  const handleLogin = () => setLoggedIn(true);
+  const handleLogin = (userEmail) => {
+    setEmail(userEmail);
+    setLoggedIn(true);
+  };
 
   return (
     <div>
@@ -19,8 +22,17 @@ function App() {
         </>
       ) : (
         <>
-          <TransactionForm onAdd={() => setRefresh((r) => r + 1)} />
-          <TransactionList refresh={refresh} />
+          <h2>Welcome!</h2>
+          <button
+            onClick={() => {
+              setLoggedIn(false);
+              setEmail("");
+            }}
+          >
+            Logout
+          </button>
+          <TransactionForm email={email} onAdd={() => {}} />
+          <TransactionList email={email} />
         </>
       )}
     </div>

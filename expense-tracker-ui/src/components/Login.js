@@ -1,4 +1,3 @@
-// src/components/Login.js
 import React, { useState } from "react";
 import api from "../api/api";
 
@@ -12,12 +11,15 @@ function Login({ onLogin }) {
     e.preventDefault();
     try {
       const res = await api.post("/auth/login", form);
-      if (res.data) {
-        localStorage.setItem("token", res.data.token || "");
-        alert("✅ Login successful!");
-        setForm({ email: "", password: "" });
-        onLogin(); // ✅ trigger App to show Transaction UI
-      }
+
+      // Use the email from the form since backend may not return it
+      const userEmail = form.email;
+      localStorage.setItem("userEmail", userEmail);
+
+      // Notify App that user logged in
+      onLogin(userEmail);
+
+      alert("✅ Login successful!");
     } catch (err) {
       console.error(err);
       alert("❌ Invalid credentials!");
@@ -28,7 +30,6 @@ function Login({ onLogin }) {
     <form onSubmit={handleSubmit}>
       <h2>Login</h2>
       <input
-        type="email"
         name="email"
         placeholder="Email"
         value={form.email}

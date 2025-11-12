@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import api from "../api/api";
 
-function Register() {
+function Register({ onRegister }) {
   const [form, setForm] = useState({ name: "", email: "", password: "" });
 
   const handleChange = (e) =>
@@ -11,8 +11,14 @@ function Register() {
     e.preventDefault();
     try {
       await api.post("/auth/register", form);
+
+      // ✅ Save email to localStorage
+      localStorage.setItem("email", form.email);
+
       alert("✅ Registration successful!");
       setForm({ name: "", email: "", password: "" });
+
+      if (onRegister) onRegister();
     } catch (err) {
       console.error(err);
       alert("❌ Error registering user! Check console for details.");
@@ -22,7 +28,6 @@ function Register() {
   return (
     <form onSubmit={handleSubmit}>
       <h2>Register</h2>
-
       <input
         name="name"
         placeholder="Full Name"
@@ -46,7 +51,6 @@ function Register() {
         onChange={handleChange}
         required
       />
-
       <button type="submit">Register</button>
     </form>
   );

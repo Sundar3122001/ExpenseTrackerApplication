@@ -1,40 +1,37 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import api from "../api/api";
 
-function TransactionList({ refresh }) {
+function TransactionList() {
   const [transactions, setTransactions] = useState([]);
-
-  const fetchTransactions = async () => {
-    try {
-      const email = localStorage.getItem("email"); // get logged-in email
-      if (!email) return;
-
-      const res = await api.get(`/transactions?email=${email}`);
-      setTransactions(res.data);
-    } catch (err) {
-      console.error(err);
-      alert("❌ Failed to fetch transactions!");
-    }
-  };
+  const userEmail = localStorage.getItem("userEmail"); // get email
 
   useEffect(() => {
-    fetchTransactions();
-  }, [refresh]); // refresh whenever parent triggers
+    const fetchTransactions = async () => {
+      try {
+        const res = await api.get("/transactions", {
+          params: { email: userEmail }, // pass email as query param
+        });
+        setTransactions(res.data);
+      } catch (err) {
+        console.error("Failed to fetch transactions ❌", err);
+      }
+    };
+
+    if (userEmail) fetchTransactions();
+  }, [userEmail]);
+
+  if (transactions.length === 0) return <p>No transactions yet!</p>;
 
   return (
     <div>
-      <h2>Your Transactions</h2>
-      {transactions.length === 0 ? (
-        <p>No transactions yet!</p>
-      ) : (
-        <ul>
-          {transactions.map((t) => (
-            <li key={t.id}>
-              {t.title} - ${t.amount}
-            </li>
-          ))}
-        </ul>
-      )}
+      <h3>Your Transactions</h3>
+      <ul>
+        {transactions.map((t) => (
+          <li key={t.id}>
+            {t.title} - {t.amount} - {t.category} - {t.type}
+          </li>
+        ))}
+      </ul>
     </div>
   );
 }

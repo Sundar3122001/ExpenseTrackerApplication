@@ -1,8 +1,8 @@
 import React, { useState } from "react";
 import api from "../api/api";
 
-function TransactionForm({ onAdd }) {
-  const [form, setForm] = useState({ title: "", amount: "" });
+function TransactionForm({ email, onAdd }) {
+  const [form, setForm] = useState({ title: "", amount: "", category: "" });
 
   const handleChange = (e) =>
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -10,20 +10,11 @@ function TransactionForm({ onAdd }) {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const email = localStorage.getItem("email"); // get logged-in email
-      if (!email) {
-        alert("❌ User email not found! Please login again.");
-        return;
-      }
 
-      await api.post(`/transactions?email=${email}`, {
-        ...form,
-        amount: parseFloat(form.amount),
-      });
-
+      await api.post(`/transactions?email=${email}`, form);
       alert("✅ Transaction added!");
-      setForm({ title: "", amount: "" });
-      onAdd(); // notify parent to refresh transaction list
+      setForm({ title: "", amount: "", category: "" });
+      onAdd(); // refresh transaction list
     } catch (err) {
       console.error(err);
       alert("❌ Failed to add transaction!");
@@ -32,7 +23,7 @@ function TransactionForm({ onAdd }) {
 
   return (
     <form onSubmit={handleSubmit}>
-      <h2>Add Transaction</h2>
+      <h3>Add Transaction</h3>
       <input
         name="title"
         placeholder="Title"
@@ -47,6 +38,12 @@ function TransactionForm({ onAdd }) {
         value={form.amount}
         onChange={handleChange}
         required
+      />
+      <input
+        name="category"
+        placeholder="Category"
+        value={form.category}
+        onChange={handleChange}
       />
       <button type="submit">Add</button>
     </form>
