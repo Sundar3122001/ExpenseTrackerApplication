@@ -1,8 +1,15 @@
-import React from 'react';
-import BackendCheck from './BackendCheck';
+import React from "react";
+import Register from "./components/Register";
+import Login from "./components/Login";
 
 function App() {
-  return <BackendCheck />;
+  return (
+    <div>
+      <h1>Expense Tracker</h1>
+      <Register />
+      <Login />
+    </div>
+  );
 }
 
 export default App;
